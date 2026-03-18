@@ -522,4 +522,15 @@ public class PlaceHolderDictTest {
 			throw e;
 		}
 	}
+
+	@Test(expected = RuntimeException.class)
+	public void testUnsupportedMessage() {
+		try {
+			d.getValues();
+		}
+		catch(RuntimeException e) {
+			assertEquals("Dictionary does not support Operations", e.getMessage());
+			throw e;
+		}
+	}
 }
