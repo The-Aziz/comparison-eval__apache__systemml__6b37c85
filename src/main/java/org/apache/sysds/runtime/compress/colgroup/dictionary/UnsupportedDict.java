@@ -19,7 +19,6 @@
 
 package org.apache.sysds.runtime.compress.colgroup.dictionary;
 
-import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.io.Serializable;
@@ -30,533 +29,525 @@ import org.apache.sysds.runtime.data.SparseBlock;
 import org.apache.sysds.runtime.functionobjects.Builtin;
 import org.apache.sysds.runtime.functionobjects.ValueFunction;
 import org.apache.sysds.runtime.instructions.cp.CM_COV_Object;
-import org.apache.sysds.runtime.io.IOUtilFunctions;
 import org.apache.sysds.runtime.matrix.data.MatrixBlock;
 import org.apache.sysds.runtime.matrix.operators.BinaryOperator;
 import org.apache.sysds.runtime.matrix.operators.ScalarOperator;
 import org.apache.sysds.runtime.matrix.operators.UnaryOperator;
 
-public class PlaceHolderDict implements IDictionary, Serializable {
+/**
+ * A Dictionary implementation that throws RuntimeException for all operations.
+ * This is used for classes that do not support operations, such as PlaceHolderDict.
+ */
+public class UnsupportedDict implements IDictionary, Serializable {
 
-	private static final long serialVersionUID = 9176356558592L;
+	private static final long serialVersionUID = 1L;
+	private final String _message;
 
-	private static final String errMessage = "PlaceHolderDict does not support Operations, and is purely intended for serialization";
+	public UnsupportedDict(String message) {
+		this._message = message;
+	}
 
-	/** The number of values supposed to be contained in this dictionary */
-	private final int nVal;
-
-	/** Static singleton for unsupported operations to avoid per-instance overhead */
-	private static final UnsupportedDict _unsupported = new UnsupportedDict(errMessage);
-
-	public PlaceHolderDict(int nVal) {
-		this.nVal = nVal;
+	private <T> T throwEx() {
+		throw new RuntimeException(_message);
 	}
 
 	@Override
 	public double[] getValues() {
-		return _unsupported.getValues();
+		return throwEx();
 	}
 
 	@Override
 	public double getValue(int i) {
-		return _unsupported.getValue(i);
+		return throwEx();
 	}
 
 	@Override
 	public double getValue(int r, int col, int nCol) {
-		return _unsupported.getValue(r, col, nCol);
+		return throwEx();
 	}
 
 	@Override
 	public long getInMemorySize() {
-		return 16 + 4;
+		return throwEx();
 	}
 
 	@Override
 	public double aggregate(double init, Builtin fn) {
-		return _unsupported.aggregate(init, fn);
+		return throwEx();
 	}
 
 	@Override
 	public double aggregateWithReference(double init, Builtin fn, double[] reference, boolean def) {
-		return _unsupported.aggregateWithReference(init, fn, reference, def);
+		return throwEx();
 	}
 
 	@Override
 	public double[] aggregateRows(Builtin fn, int nCol) {
-		return _unsupported.aggregateRows(fn, nCol);
+		return throwEx();
 	}
 
 	@Override
 	public double[] aggregateRowsWithDefault(Builtin fn, double[] defaultTuple) {
-		return _unsupported.aggregateRowsWithDefault(fn, defaultTuple);
+		return throwEx();
 	}
 
 	@Override
 	public double[] aggregateRowsWithReference(Builtin fn, double[] reference) {
-		return _unsupported.aggregateRowsWithReference(fn, reference);
+		return throwEx();
 	}
 
 	@Override
 	public void aggregateCols(double[] c, Builtin fn, IColIndex colIndexes) {
-		_unsupported.aggregateCols(c, fn, colIndexes);
+		throwEx();
 	}
 
 	@Override
 	public void aggregateColsWithReference(double[] c, Builtin fn, IColIndex colIndexes, double[] reference,
 		boolean def) {
-		_unsupported.aggregateColsWithReference(c, fn, colIndexes, reference, def);
+		throwEx();
 	}
 
 	@Override
 	public IDictionary applyScalarOp(ScalarOperator op) {
-		return _unsupported.applyScalarOp(op);
+		return throwEx();
 	}
 
 	@Override
 	public IDictionary applyScalarOpAndAppend(ScalarOperator op, double v0, int nCol) {
-		return _unsupported.applyScalarOpAndAppend(op, v0, nCol);
+		return throwEx();
 	}
 
 	@Override
 	public IDictionary applyUnaryOp(UnaryOperator op) {
-		return _unsupported.applyUnaryOp(op);
+		return throwEx();
 	}
 
 	@Override
 	public IDictionary applyUnaryOpAndAppend(UnaryOperator op, double v0, int nCol) {
-		return _unsupported.applyUnaryOpAndAppend(op, v0, nCol);
+		return throwEx();
 	}
 
 	@Override
 	public IDictionary applyScalarOpWithReference(ScalarOperator op, double[] reference, double[] newReference) {
-		return _unsupported.applyScalarOpWithReference(op, reference, newReference);
+		return throwEx();
 	}
 
 	@Override
 	public IDictionary applyUnaryOpWithReference(UnaryOperator op, double[] reference, double[] newReference) {
-		return _unsupported.applyUnaryOpWithReference(op, reference, newReference);
+		return throwEx();
 	}
 
 	@Override
 	public IDictionary binOpLeft(BinaryOperator op, double[] v, IColIndex colIndexes) {
-		return _unsupported.binOpLeft(op, v, colIndexes);
+		return throwEx();
 	}
 
 	@Override
 	public IDictionary binOpLeftAndAppend(BinaryOperator op, double[] v, IColIndex colIndexes) {
-		return _unsupported.binOpLeftAndAppend(op, v, colIndexes);
+		return throwEx();
 	}
 
 	@Override
 	public IDictionary binOpLeftWithReference(BinaryOperator op, double[] v, IColIndex colIndexes, double[] reference,
 		double[] newReference) {
-		return _unsupported.binOpLeftWithReference(op, v, colIndexes, reference, newReference);
+		return throwEx();
 	}
 
 	@Override
 	public IDictionary binOpRight(BinaryOperator op, double[] v, IColIndex colIndexes) {
-		return _unsupported.binOpRight(op, v, colIndexes);
+		return throwEx();
 	}
 
 	@Override
 	public IDictionary binOpRightAndAppend(BinaryOperator op, double[] v, IColIndex colIndexes) {
-		return _unsupported.binOpRightAndAppend(op, v, colIndexes);
+		return throwEx();
 	}
 
 	@Override
 	public IDictionary binOpRight(BinaryOperator op, double[] v) {
-		return _unsupported.binOpRight(op, v);
+		return throwEx();
 	}
 
 	@Override
 	public IDictionary binOpRightWithReference(BinaryOperator op, double[] v, IColIndex colIndexes, double[] reference,
 		double[] newReference) {
-		return _unsupported.binOpRightWithReference(op, v, colIndexes, reference, newReference);
+		return throwEx();
 	}
 
 	@Override
 	public void write(DataOutput out) throws IOException {
-		byte[] o = new byte[5];
-		o[0] = (byte) DictionaryFactory.Type.PLACE_HOLDER.ordinal();
-		IOUtilFunctions.intToBa(nVal, o, 1);
-		out.write(o);
-	}
-
-	public static PlaceHolderDict read(DataInput in) throws IOException {
-		int nVals = in.readInt();
-		return new PlaceHolderDict(nVals);
+		throwEx();
 	}
 
 	@Override
 	public long getExactSizeOnDisk() {
-		return 1 + 4;
+		return throwEx();
 	}
 
 	@Override
 	public DictType getDictType() {
-		return _unsupported.getDictType();
+		return throwEx();
 	}
 
 	@Override
 	public int getNumberOfValues(int nCol) {
-		return nVal;
+		return throwEx();
 	}
 
 	@Override
 	public double[] sumAllRowsToDouble(int nrColumns) {
-		return _unsupported.sumAllRowsToDouble(nrColumns);
+		return throwEx();
 	}
 
 	@Override
 	public double[] sumAllRowsToDoubleWithDefault(double[] defaultTuple) {
-		return _unsupported.sumAllRowsToDoubleWithDefault(defaultTuple);
+		return throwEx();
 	}
 
 	@Override
 	public double[] sumAllRowsToDoubleWithReference(double[] reference) {
-		return _unsupported.sumAllRowsToDoubleWithReference(reference);
+		return throwEx();
 	}
 
 	@Override
 	public double[] sumAllRowsToDoubleSq(int nrColumns) {
-		return _unsupported.sumAllRowsToDoubleSq(nrColumns);
+		return throwEx();
 	}
 
 	@Override
 	public double[] sumAllRowsToDoubleSqWithDefault(double[] defaultTuple) {
-		return _unsupported.sumAllRowsToDoubleSqWithDefault(defaultTuple);
+		return throwEx();
 	}
 
 	@Override
 	public double[] sumAllRowsToDoubleSqWithReference(double[] reference) {
-		return _unsupported.sumAllRowsToDoubleSqWithReference(reference);
+		return throwEx();
 	}
 
 	@Override
 	public double[] productAllRowsToDouble(int nrColumns) {
-		return _unsupported.productAllRowsToDouble(nrColumns);
+		return throwEx();
 	}
 
 	@Override
 	public double[] productAllRowsToDoubleWithDefault(double[] defaultTuple) {
-		return _unsupported.productAllRowsToDoubleWithDefault(defaultTuple);
+		return throwEx();
 	}
 
 	@Override
 	public double[] productAllRowsToDoubleWithReference(double[] reference) {
-		return _unsupported.productAllRowsToDoubleWithReference(reference);
+		return throwEx();
 	}
 
 	@Override
 	public void colSum(double[] c, int[] counts, IColIndex colIndexes) {
-		_unsupported.colSum(c, counts, colIndexes);
+		throwEx();
 	}
 
 	@Override
 	public void colSumSq(double[] c, int[] counts, IColIndex colIndexes) {
-		_unsupported.colSumSq(c, counts, colIndexes);
+		throwEx();
 	}
 
 	@Override
 	public void colSumSqWithReference(double[] c, int[] counts, IColIndex colIndexes, double[] reference) {
-		_unsupported.colSumSqWithReference(c, counts, colIndexes, reference);
+		throwEx();
 	}
 
 	@Override
 	public double sum(int[] counts, int nCol) {
-		return _unsupported.sum(counts, nCol);
+		return throwEx();
 	}
 
 	@Override
 	public double sumSq(int[] counts, int nCol) {
-		return _unsupported.sumSq(counts, nCol);
+		return throwEx();
 	}
 
 	@Override
 	public double sumSqWithReference(int[] counts, double[] reference) {
-		return _unsupported.sumSqWithReference(counts, reference);
+		return throwEx();
 	}
 
 	@Override
 	public String getString(int colIndexes) {
-		return ""; // get string empty
+		return throwEx();
 	}
 
 	@Override
 	public IDictionary sliceOutColumnRange(int idxStart, int idxEnd, int previousNumberOfColumns) {
-		return _unsupported.sliceOutColumnRange(idxStart, idxEnd, previousNumberOfColumns);
+		return throwEx();
 	}
 
 	@Override
 	public boolean containsValue(double pattern) {
-		return _unsupported.containsValue(pattern);
+		return throwEx();
 	}
 
 	@Override
 	public boolean containsValueWithReference(double pattern, double[] reference) {
-		return _unsupported.containsValueWithReference(pattern, reference);
+		return throwEx();
 	}
 
 	@Override
 	public long getNumberNonZeros(int[] counts, int nCol) {
-		return -1;
+		return throwEx();
 	}
 
 	@Override
 	public int[] countNNZZeroColumns(int[] counts) {
-		return _unsupported.countNNZZeroColumns(counts);
+		return throwEx();
 	}
 
 	@Override
 	public long getNumberNonZerosWithReference(int[] counts, double[] reference, int nRows) {
-		return _unsupported.getNumberNonZerosWithReference(counts, reference, nRows);
+		return throwEx();
 	}
 
 	@Override
 	public void addToEntry(double[] v, int fr, int to, int nCol) {
-		_unsupported.addToEntry(v, fr, to, nCol);
+		throwEx();
 	}
 
 	@Override
 	public void addToEntry(double[] v, int fr, int to, int nCol, int rep) {
-		_unsupported.addToEntry(v, fr, to, nCol, rep);
+		throwEx();
 	}
 
 	@Override
 	public void addToEntryVectorized(double[] v, int f1, int f2, int f3, int f4, int f5, int f6, int f7, int f8, int t1,
 		int t2, int t3, int t4, int t5, int t6, int t7, int t8, int nCol) {
-		_unsupported.addToEntryVectorized(v, f1, f2, f3, f4, f5, f6, f7, f8, t1, t2, t3, t4, t5, t6, t7, t8, nCol);
+		throwEx();
 	}
 
 	@Override
 	public IDictionary subtractTuple(double[] tuple) {
-		return _unsupported.subtractTuple(tuple);
+		return throwEx();
 	}
 
 	@Override
 	public MatrixBlockDictionary getMBDict(int nCol) {
-		return _unsupported.getMBDict(nCol);
+		return throwEx();
 	}
 
 	@Override
 	public IDictionary scaleTuples(int[] scaling, int nCol) {
-		return _unsupported.scaleTuples(scaling, nCol);
+		return throwEx();
 	}
 
 	@Override
 	public IDictionary preaggValuesFromDense(int numVals, IColIndex colIndexes, IColIndex aggregateColumns, double[] b,
 		int cut) {
-		return _unsupported.preaggValuesFromDense(numVals, colIndexes, aggregateColumns, b, cut);
+		return throwEx();
 	}
 
 	@Override
 	public IDictionary replace(double pattern, double replace, int nCol) {
-		return _unsupported.replace(pattern, replace, nCol);
+		return throwEx();
 	}
 
 	@Override
 	public IDictionary replaceWithReference(double pattern, double replace, double[] reference) {
-		return _unsupported.replaceWithReference(pattern, replace, reference);
+		return throwEx();
 	}
 
 	@Override
 	public void product(double[] ret, int[] counts, int nCol) {
-		_unsupported.product(ret, counts, nCol);
+		throwEx();
 	}
 
 	@Override
 	public void productWithDefault(double[] ret, int[] counts, double[] def, int defCount) {
-		_unsupported.productWithDefault(ret, counts, def, defCount);
+		throwEx();
 	}
 
 	@Override
 	public void productWithReference(double[] ret, int[] counts, double[] reference, int refCount) {
-		_unsupported.productWithReference(ret, counts, reference, refCount);
+		throwEx();
 	}
 
 	@Override
 	public void colProduct(double[] res, int[] counts, IColIndex colIndexes) {
-		_unsupported.colProduct(res, counts, colIndexes);
+		throwEx();
 	}
 
 	@Override
 	public void colProductWithReference(double[] res, int[] counts, IColIndex colIndexes, double[] reference) {
-		_unsupported.colProductWithReference(res, counts, colIndexes, reference);
+		throwEx();
 	}
 
 	@Override
 	public CM_COV_Object centralMoment(ValueFunction fn, int[] counts, int nRows) {
-		return _unsupported.centralMoment(fn, counts, nRows);
+		return throwEx();
 	}
 
 	@Override
 	public CM_COV_Object centralMoment(CM_COV_Object ret, ValueFunction fn, int[] counts, int nRows) {
-		return _unsupported.centralMoment(ret, fn, counts, nRows);
+		return throwEx();
 	}
 
 	@Override
 	public CM_COV_Object centralMomentWithDefault(ValueFunction fn, int[] counts, double def, int nRows) {
-		return _unsupported.centralMomentWithDefault(fn, counts, def, nRows);
+		return throwEx();
 	}
 
 	@Override
 	public CM_COV_Object centralMomentWithDefault(CM_COV_Object ret, ValueFunction fn, int[] counts, double def,
 		int nRows) {
-		return _unsupported.centralMomentWithDefault(ret, fn, counts, def, nRows);
+		return throwEx();
 	}
 
 	@Override
 	public CM_COV_Object centralMomentWithReference(ValueFunction fn, int[] counts, double reference, int nRows) {
-		return _unsupported.centralMomentWithReference(fn, counts, reference, nRows);
+		return throwEx();
 	}
 
 	@Override
 	public CM_COV_Object centralMomentWithReference(CM_COV_Object ret, ValueFunction fn, int[] counts, double reference,
 		int nRows) {
-		return _unsupported.centralMomentWithReference(ret, fn, counts, reference, nRows);
+		return throwEx();
 	}
 
 	@Override
 	public IDictionary rexpandCols(int max, boolean ignore, boolean cast, int nCol) {
-		return _unsupported.rexpandCols(max, ignore, cast, nCol);
+		return throwEx();
 	}
 
 	@Override
 	public IDictionary rexpandColsWithReference(int max, boolean ignore, boolean cast, int reference) {
-		return _unsupported.rexpandColsWithReference(max, ignore, cast, reference);
+		return throwEx();
 	}
 
 	@Override
 	public double getSparsity() {
-		return _unsupported.getSparsity();
+		return throwEx();
 	}
 
 	@Override
 	public void multiplyScalar(double v, double[] ret, int off, int dictIdx, IColIndex cols) {
-		_unsupported.multiplyScalar(v, ret, off, dictIdx, cols);
+		throwEx();
 	}
 
 	@Override
 	public void TSMMWithScaling(int[] counts, IColIndex rows, IColIndex cols, MatrixBlock ret) {
-		_unsupported.TSMMWithScaling(counts, rows, cols, ret);
+		throwEx();
 	}
 
 	@Override
 	public void MMDict(IDictionary right, IColIndex rowsLeft, IColIndex colsRight, MatrixBlock result) {
-		_unsupported.MMDict(right, rowsLeft, colsRight, result);
+		throwEx();
 	}
 
 	@Override
 	public void MMDictDense(double[] left, IColIndex rowsLeft, IColIndex colsRight, MatrixBlock result) {
-		_unsupported.MMDictDense(left, rowsLeft, colsRight, result);
+		throwEx();
 	}
 
 	@Override
 	public void MMDictSparse(SparseBlock left, IColIndex rowsLeft, IColIndex colsRight, MatrixBlock result) {
-		_unsupported.MMDictSparse(left, rowsLeft, colsRight, result);
+		throwEx();
 	}
 
 	@Override
 	public void TSMMToUpperTriangle(IDictionary right, IColIndex rowsLeft, IColIndex colsRight, MatrixBlock result) {
-		_unsupported.TSMMToUpperTriangle(right, rowsLeft, colsRight, result);
+		throwEx();
 	}
 
 	@Override
 	public void TSMMToUpperTriangleDense(double[] left, IColIndex rowsLeft, IColIndex colsRight, MatrixBlock result) {
-		_unsupported.TSMMToUpperTriangleDense(left, rowsLeft, colsRight, result);
+		throwEx();
 	}
 
 	@Override
 	public void TSMMToUpperTriangleSparse(SparseBlock left, IColIndex rowsLeft, IColIndex colsRight,
 		MatrixBlock result) {
-		_unsupported.TSMMToUpperTriangleSparse(left, rowsLeft, colsRight, result);
+		throwEx();
 	}
 
 	@Override
 	public void TSMMToUpperTriangleScaling(IDictionary right, IColIndex rowsLeft, IColIndex colsRight, int[] scale,
 		MatrixBlock result) {
-		_unsupported.TSMMToUpperTriangleScaling(right, rowsLeft, colsRight, scale, result);
+		throwEx();
 	}
 
 	@Override
 	public void TSMMToUpperTriangleDenseScaling(double[] left, IColIndex rowsLeft, IColIndex colsRight, int[] scale,
 		MatrixBlock result) {
-		_unsupported.TSMMToUpperTriangleDenseScaling(left, rowsLeft, colsRight, scale, result);
+		throwEx();
 	}
 
 	@Override
 	public void TSMMToUpperTriangleSparseScaling(SparseBlock left, IColIndex rowsLeft, IColIndex colsRight, int[] scale,
 		MatrixBlock result) {
-		_unsupported.TSMMToUpperTriangleSparseScaling(left, rowsLeft, colsRight, scale, result);
+		throwEx();
 	}
 
 	@Override
 	public IDictionary cbind(IDictionary that, int nCol) {
-		return _unsupported.cbind(that, nCol);
+		return throwEx();
 	}
 
 	@Override
 	public boolean equals(IDictionary o) {
-		return o instanceof PlaceHolderDict;
+		return throwEx();
 	}
 
 	@Override
 	public final boolean equals(double[] v) {
-		return false;
+		return throwEx();
 	}
 
 	@Override
 	public IDictionary reorder(int[] reorder) {
-		return _unsupported.reorder(reorder);
+		return throwEx();
 	}
 
 	@Override
 	public IDictionary clone() {
-		return new PlaceHolderDict(nVal);
+		return throwEx();
 	}
 
 	@Override
 	public void MMDictScaling(IDictionary right, IColIndex rowsLeft, IColIndex colsRight, MatrixBlock result,
 		int[] scaling) {
-		_unsupported.MMDictScaling(right, rowsLeft, colsRight, result, scaling);
+		throwEx();
 	}
 
 	@Override
 	public void MMDictScalingDense(double[] left, IColIndex rowsLeft, IColIndex colsRight, MatrixBlock result,
 		int[] scaling) {
-		_unsupported.MMDictScalingDense(left, rowsLeft, colsRight, result, scaling);
+		throwEx();
 	}
 
 	@Override
 	public void MMDictScalingSparse(SparseBlock left, IColIndex rowsLeft, IColIndex colsRight, MatrixBlock result,
 		int[] scaling) {
-		_unsupported.MMDictScalingSparse(left, rowsLeft, colsRight, result, scaling);
+		throwEx();
 	}
 
 	@Override
 	public IDictionary rightMMPreAggSparse(int numVals, SparseBlock b, IColIndex thisCols, IColIndex aggregateColumns,
 		int nColRight) {
-		return _unsupported.rightMMPreAggSparse(numVals, b, thisCols, aggregateColumns, nColRight);
+		return throwEx();
 	}
 
 	@Override
 	public void putSparse(SparseBlock sb, int idx, int rowOut, int nCol, IColIndex columns) {
-		_unsupported.putSparse(sb, idx, rowOut, nCol, columns);
+		throwEx();
 	}
 
 	@Override
 	public void putDense(DenseBlock sb, int idx, int rowOut, int nCol, IColIndex columns) {
-		_unsupported.putDense(sb, idx, rowOut, nCol, columns);
+		throwEx();
 	}
 
 	@Override
 	public IDictionary append(double[] row) {
-		return _unsupported.append(row);
+		return throwEx();
 	}
 
 	@Override
 	public double[] getRow(int i, int nCol) {
-		return _unsupported.getRow(i, nCol);
+		return throwEx();
 	}
 }
